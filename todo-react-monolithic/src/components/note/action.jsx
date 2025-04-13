@@ -1,3 +1,5 @@
+/** Use for Redux Thunk Only */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 

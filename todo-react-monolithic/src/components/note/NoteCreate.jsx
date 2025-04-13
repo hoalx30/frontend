@@ -1,7 +1,6 @@
 import { nanoid } from 'nanoid';
 import { memo, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { noteThunkActions } from './action';
+import { useSaveNote } from './query';
 
 /** Use Context API with Reducer
 import { useNoteContext } from '../../hooks';
@@ -36,6 +35,39 @@ const onNoteCreate = async () => {
 };
 */
 
+/** Use for Redux Thunk Only
+const [value, setValue] = useState('');
+const [priority, setPriority] = useState('Medium');
+const [status, setStatus] = useState('Todo');
+const valueRef = useRef(undefined);
+
+const dispatch = useDispatch();
+
+const onNoteCreate = async () => {
+	// @ts-ignore
+	dispatch(noteThunkActions.saveNote({ id: nanoid(), value, status, priority, createdAt: Date.now() }));
+	setValue('');
+	setStatus('Todo');
+	valueRef.current?.focus();
+};
+*/
+
+/** Use for RTK Query Only
+const [value, setValue] = useState('');
+const [priority, setPriority] = useState('Medium');
+const [status, setStatus] = useState('Todo');
+const valueRef = useRef(undefined);
+
+const [saveNote, { isLoading }] = useSaveNoteMutation();
+
+const onNoteCreate = async () => {
+	await saveNote({ id: nanoid(), value, status, priority, createdAt: Date.now() }).unwrap();
+	setValue('');
+	setStatus('Todo');
+	valueRef.current?.focus();
+};
+*/
+
 const NoteCreate = () => {
 	console.log('Render Note Create');
 
@@ -44,11 +76,11 @@ const NoteCreate = () => {
 	const [status, setStatus] = useState('Todo');
 	const valueRef = useRef(undefined);
 
-	const dispatch = useDispatch();
+	const { mutate: saveNote, isPending: isLoading } = useSaveNote();
 
 	const onNoteCreate = async () => {
 		// @ts-ignore
-		dispatch(noteThunkActions.saveNote({ id: nanoid(), value, status, priority, createdAt: Date.now() }));
+		saveNote({ id: nanoid(), value, status, priority, createdAt: Date.now() });
 		setValue('');
 		setStatus('Todo');
 		valueRef.current?.focus();
@@ -58,6 +90,11 @@ const NoteCreate = () => {
 		<div>
 			<br />
 			<strong>Create Note:</strong> <br />
+			{isLoading && (
+				<p>
+					Loading... <br />
+				</p>
+			)}
 			<input ref={valueRef} type="text" value={value} onChange={(e) => setValue(e.target.value)} />
 			<select value={priority} onChange={(e) => setPriority(e.target.value)}>
 				<option value="Medium">Medium</option>

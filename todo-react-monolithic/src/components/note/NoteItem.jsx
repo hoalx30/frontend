@@ -1,6 +1,5 @@
 import { memo } from 'react';
-import { useDispatch } from 'react-redux';
-import { noteThunkActions } from './action';
+import { useCancelNote, useDoNote, useFinishNote, useRemoveNote } from './query';
 
 /** Use Context API with Reducer
 import { useNoteContext } from '../../hooks';
@@ -14,19 +13,50 @@ const onCancelNote = async (id) => actions.cancel(id);
 const onDeleteNote = async (id) => actions.remove(id);
 */
 
+/** Use for Redux Thunk Only
+const { id, value, status, priority, createdAt } = data;
+
+const dispatch = useDispatch();
+// @ts-ignore
+const onDoNote = async (id) => dispatch(noteThunkActions.doNote(id));
+// @ts-ignore
+const onFinishNote = async (id) => dispatch(noteThunkActions.finishNote(id));
+// @ts-ignore
+const onCancelNote = async (id) => dispatch(noteThunkActions.cancelNote(id));
+// @ts-ignore
+const onDeleteNote = async (id) => dispatch(noteThunkActions.removeNote(id));
+*/
+
+/** Use for RTK Query Only
+console.log('Render Note Item');
+
+const { id, value, status, priority, createdAt } = data;
+
+const [doNote] = useDoNoteMutation();
+const [finishNote] = useFinishNoteMutation();
+const [cancelNote] = useCancelNoteMutation();
+const [removeNote] = useRemoveNoteMutation();
+
+const onDoNote = async (id) => await doNote(id);
+const onFinishNote = async (id) => await finishNote(id);
+const onCancelNote = async (id) => await cancelNote(id);
+const onDeleteNote = async (id) => await removeNote(id);
+*/
+
 const NoteItem = ({ data }) => {
 	console.log('Render Note Item');
 
 	const { id, value, status, priority, createdAt } = data;
-	const dispatch = useDispatch();
-	// @ts-ignore
-	const onDoNote = async (id) => dispatch(noteThunkActions.doNote(id));
-	// @ts-ignore
-	const onFinishNote = async (id) => dispatch(noteThunkActions.finishNote(id));
-	// @ts-ignore
-	const onCancelNote = async (id) => dispatch(noteThunkActions.cancelNote(id));
-	// @ts-ignore
-	const onDeleteNote = async (id) => dispatch(noteThunkActions.removeNote(id));
+
+	const { mutate: doNote } = useDoNote();
+	const { mutate: finishNote } = useFinishNote();
+	const { mutate: cancelNote } = useCancelNote();
+	const { mutate: removeNote } = useRemoveNote();
+
+	const onDoNote = async (id) => doNote(id);
+	const onFinishNote = async (id) => finishNote(id);
+	const onCancelNote = async (id) => cancelNote(id);
+	const onDeleteNote = async (id) => removeNote(id);
 	return (
 		<tr>
 			<td style={{ width: '20%', textAlign: 'end' }}>{id}</td>

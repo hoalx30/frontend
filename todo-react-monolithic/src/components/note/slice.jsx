@@ -1,6 +1,5 @@
 /** Use for Redux or Redux Toolkit Only */
 import { createSlice } from '@reduxjs/toolkit';
-import { noteThunkActions } from './action';
 
 const initialState = {
 	latestNote: [],
@@ -54,7 +53,10 @@ const noteSlice = createSlice({
 			state.isSearching = false;
 		},
 	},
-	extraReducers: (builder) => {
+	/** Use for Redux Thunk Only
+	 	import { noteThunkActions } from './action';
+	
+		extraReducers: (builder) => {
 		builder
 			.addCase(noteThunkActions.fetchLatestNote.fulfilled, (state, action) => {
 				state.isFetching = false;
@@ -86,6 +88,7 @@ const noteSlice = createSlice({
 				(state) => { state.isFetching = true},
 			);
 	},
+	*/
 });
 
 export const noteActions = noteSlice.actions;

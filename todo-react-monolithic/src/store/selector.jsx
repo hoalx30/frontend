@@ -1,3 +1,5 @@
+/** Not needed for RTK Query */
+
 export default {
 	latestNote: (state) => state.note.latestNote,
 	latestSearchNote: (state) => state.note.latestSearchNote,
